@@ -2,4 +2,4 @@
 *.pgn
 intermediate*
 *~
-*.pt
+__pycache__
