@@ -228,6 +228,8 @@ def log_proc_count(change: str, active_games: set[str]) -> None:
     """
     symbol = "+++" if change == "Freed" else "---"
     logger.info(f"{symbol} Process {change}. Count: {len(active_games)}. IDs: {active_games or None}")
+    if change == "Freed":
+        quit()
 
 
 def lichess_bot_main(li: lichess.Lichess,
@@ -506,7 +508,7 @@ def handle_challenge(event: EVENT_TYPE, li: lichess.Lichess, challenge_queue: MU
         li.decline_challenge(chlng.id, reason=decline_reason)
 
 
-@backoff.on_exception(backoff.expo, BaseException, max_time=600, giveup=is_final)  # type: ignore[arg-type]
+#@backoff.on_exception(backoff.expo, BaseException, max_time=600, giveup=is_final)  # type: ignore[arg-type]
 def play_game(li: lichess.Lichess,
               game_id: str,
               control_queue: CONTROL_QUEUE_TYPE,

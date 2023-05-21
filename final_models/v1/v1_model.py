@@ -12,9 +12,6 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-tokens_filepath = "tokens.txt"
-model_filepath = "v1_model"
-
 # hyperparameters
 block_size = 64 # what is the maximum context length for predictions?
 eval_iters = 100
@@ -26,15 +23,24 @@ dropout = 0.0
 
 device = 'cpu'
 
-with open(tokens_filepath, "r") as f:
-    tokens = f.read().splitlines()
-    
-tokens = ["ZERO", "START"] + tokens
-
+tokens = None
 token_to_int = {}
 int_to_token = {}
+vocab_size = None
 
-for i, token in enumerate(tokens):
+def load_tokens(tokens_filepath):
+  global tokens
+  global token_to_int
+  global int_to_token
+  global vocab_size
+  
+  with open(tokens_filepath, "r") as f:
+    tokens = f.read().splitlines()
+      
+  tokens = ["ZERO", "START"] + tokens
+  vocab_size = len(tokens)
+
+  for i, token in enumerate(tokens):
     token_to_int[token] = i
     int_to_token[i] = token
     
@@ -43,7 +49,6 @@ def encode(lst):
 def decode(lst):
     return [int_to_token[i] for i in lst]
 
-vocab_size = len(tokens)
 
 class Head(nn.Module):
     """ one head of self-attention """
@@ -150,9 +155,14 @@ class BigramLanguageModel(nn.Module):
 
         return logits, loss
 
-
-v1_model = BigramLanguageModel()
-v1_model.load_state_dict(torch.load(model_filepath + "_state.pt"))
+def LoadModel(model_filepath):
+  
+  assert vocab_size > 0
+  assert len(tokens) > 0
+  
+  v1_model = BigramLanguageModel()
+  v1_model.load_state_dict(torch.load(model_filepath))
+  return v1_model
 
 def EncodeMoveSequence(move_list):
     game = chess_game_tracker.Game()
@@ -193,15 +203,18 @@ def GetTopLegalMove(moves_and_weights):
         if mv is not None:
             return mv
 
-def test_game():
+def test_game(model):
   moves = []
   
-  for i in range(100):
-      moves_and_weights = GetWeightedMovesFromModel(v1_model, moves)
+  for i in range(10):
+      moves_and_weights = GetWeightedMovesFromModel(model, moves)
       move = GetTopLegalMove(moves_and_weights)
       # print (move)
       moves.append(move)
       
   print (chess.Board().variation_san(moves))
   
-test_game()
+if __name__ == "__main__":
+  load_tokens("tokens.txt")
+  mm = LoadModel("v1_model_state.pt")
+  test_game(mm)

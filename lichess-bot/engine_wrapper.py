@@ -183,7 +183,7 @@ class EngineWrapper:
             else:
                 time_limit = game_clock_time(board, game, start_time, move_overhead)
 
-            best_move = self.search(board, time_limit, can_ponder, draw_offered, best_move)
+            best_move = self.search(board, time_limit, can_ponder, draw_offered, best_move, game, "@@@")
         else:
             self.stop()
 
