@@ -9,11 +9,6 @@ import chess
 import chess_util
 
 
-def RelativePosToAbsolute(curr_pos, rel_pos_x, rel_pos_y):
-    return chess.square(
-        chess.square_file(curr_pos) + int(rel_pos_x),
-        chess.square_rank(curr_pos) + int(rel_pos_y))
-
 def DecodePawnMove(curr_pos, enc, is_white):
     dx = 0
     dy = 1
@@ -58,14 +53,10 @@ class DecoderBoard:
         move = move.split(":")
         piece = move[0]
         
-        if piece in ["Q", "BD", "BL"]:
+        if piece in ["Q", "BD", "BL", "R1", "R2", "K", "N1", "N2"]:
             piece = self.AddColor(piece)
             curr_pos = self.piece_to_square[piece]
             next_pos = chess.parse_square(move[1])
-        elif piece in ["R1", "R2", "K", "N1", "N2"]:
-            piece = self.AddColor(piece)
-            curr_pos = self.piece_to_square[piece]
-            next_pos = RelativePosToAbsolute(curr_pos, move[1], move[2])
         elif piece == "Pawn":
             curr_pos = chess.parse_square(move[1])
             next_pos = DecodePawnMove(curr_pos, move[2], self.is_white)

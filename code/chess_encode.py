@@ -11,14 +11,6 @@ import chess_util
 def encode_square(sq):
     return chess.square_name(sq)
 
-def encode_relative(move):
-    fr_rank = chess.square_rank(move.from_square)
-    to_rank = chess.square_rank(move.to_square)
-    fr_file = chess.square_file(move.from_square)
-    to_file = chess.square_file(move.to_square)
-    
-    return str(to_file - fr_file) + ":" + str(to_rank - fr_rank)
-
 def encode_pawn(move):
     fr_rank = chess.square_rank(move.from_square)
     to_rank = chess.square_rank(move.to_square)
@@ -42,10 +34,7 @@ def encode_pawn(move):
         return prefix + "TwoPush"
       
 def encode_non_pawn(piece, move):
-    if ":B" in piece or ":Q" in piece:
-        return piece[2:] + ":" + encode_square(move.to_square)
-    else:
-        return piece[2:] + ":" + encode_relative(move)
+    return piece[2:] + ":" + encode_square(move.to_square)
 
 class EncoderBoard:
     def __init__(self):
